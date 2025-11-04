@@ -1,0 +1,27 @@
+{
+  "name": "hexlet/code",
+  "description": "page analyzer",
+  "type": "project",
+  "license": "mit",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "autoload": {
+    "psr-4": {
+      "Hexlet\\Code\\": "app/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Hexlet\\Code\\Tests\\": "tests/"
+    }
+  },
+  "require": {
+    "slim/slim": "^4.0",
+    "slim/psr7": "^1.7",
+    "slim/http": "^1.4"
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "4.x-dev",
+    "phpunit/phpunit": "^13.0@dev"
+  }
+}
