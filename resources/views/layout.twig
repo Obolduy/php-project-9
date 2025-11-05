@@ -11,7 +11,9 @@
     {% include 'header.twig' %}
 
     <main class="flex-grow-1">
-        {% block content %}{% endblock %}
+        <div class="container-lg mt-3">
+            {% block content %}{% endblock %}
+        </div>
     </main>
 
     {% include 'footer.twig' %}
@@ -21,4 +23,3 @@
             crossorigin="anonymous"></script>
 </body>
 </html>
-
