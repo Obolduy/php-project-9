@@ -6,50 +6,15 @@ class UrlAnalysis
 {
     private ?int $id = null;
 
-    public int $urlId {
-        get {
-            return $this->urlId;
-        }
-        set {
-            $this->urlId = $value;
-        }
-    }
+    private int $urlId;
 
-    public ?int $responseCode = null {
-        get {
-            return $this->responseCode;
-        }
-        set {
-            $this->responseCode = $value;
-        }
-    }
+    private ?int $responseCode = null;
 
-    public ?string $h1 = null {
-        get {
-            return $this->h1;
-        }
-        set {
-            $this->h1 = $value;
-        }
-    }
+    private ?string $h1 = null;
 
-    public ?string $title = null {
-        get {
-            return $this->title;
-        }
-        set {
-            $this->title = $value;
-        }
-    }
+    private ?string $title = null;
 
-    public ?string $description = null {
-        get {
-            return $this->description;
-        }
-        set {
-            $this->description = $value;
-        }
-    }
+    private ?string $description = null;
 
     private ?string $createdAt = null;
 
@@ -99,6 +64,56 @@ class UrlAnalysis
     public function setId(int $id): void
     {
         $this->id = $id;
+    }
+
+    public function getUrlId(): int
+    {
+        return $this->urlId;
+    }
+
+    public function setUrlId(int $urlId): void
+    {
+        $this->urlId = $urlId;
+    }
+
+    public function getResponseCode(): ?int
+    {
+        return $this->responseCode;
+    }
+
+    public function setResponseCode(?int $responseCode): void
+    {
+        $this->responseCode = $responseCode;
+    }
+
+    public function getH1(): ?string
+    {
+        return $this->h1;
+    }
+
+    public function setH1(?string $h1): void
+    {
+        $this->h1 = $h1;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(?string $title): void
+    {
+        $this->title = $title;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): void
+    {
+        $this->description = $description;
     }
 
     public function getCreatedAt(): ?string

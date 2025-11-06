@@ -6,14 +6,8 @@ class Url
 {
     private ?int $id = null;
 
-    public string $name {
-        get {
-            return $this->name;
-        }
-        set {
-            $this->name = $value;
-        }
-    }
+    private string $name;
+
     private ?string $createdAt = null;
 
     private ?string $updatedAt = null;
@@ -46,6 +40,17 @@ class Url
     public function setId(int $id): self
     {
         $this->id = $id;
+        return $this;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
         return $this;
     }
 

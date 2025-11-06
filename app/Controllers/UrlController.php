@@ -123,15 +123,15 @@ class UrlController
             $params = [
                 'url' => [
                     'id' => $url->getId(),
-                    'name' => $url->name,
+                    'name' => $url->getName(),
                     'createdAt' => $url->getCreatedAt()
                 ],
                 'checks' => array_map(fn($check) => [
                     'id' => $check->getId(),
-                    'responseCode' => $check->responseCode,
-                    'h1' => $check->h1,
-                    'title' => $check->title,
-                    'description' => $check->description,
+                    'responseCode' => $check->getResponseCode(),
+                    'h1' => $check->getH1(),
+                    'title' => $check->getTitle(),
+                    'description' => $check->getDescription(),
                     'createdAt' => $check->getCreatedAt()
                 ], $checks),
                 'flash' => $this->flash->getAll(),
@@ -155,7 +155,7 @@ class UrlController
                 return $response->withStatus(404)->write(Messages::URL_NOT_FOUND);
             }
 
-            $checkResult = $this->checker->check($url->name);
+            $checkResult = $this->checker->check($url->getName());
 
             if ($checkResult === null) {
                 $this->flash->set('error', Messages::CHECK_NETWORK_ERROR);

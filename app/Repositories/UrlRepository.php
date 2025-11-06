@@ -76,7 +76,7 @@ class UrlRepository
              VALUES (?, ?, ?) 
              RETURNING id'
         );
-        $stmt->execute([$url->name, $now, $now]);
+        $stmt->execute([$url->getName(), $now, $now]);
         $data = $stmt->fetch();
 
         $url->setId($data['id'])
@@ -92,7 +92,7 @@ class UrlRepository
              SET name = ?, updated_at = ? 
              WHERE id = ?'
         );
-        $stmt->execute([$url->name, $now, $url->getId()]);
+        $stmt->execute([$url->getName(), $now, $url->getId()]);
 
         $url->setUpdatedAt($now);
     }

@@ -51,11 +51,11 @@ class UrlAnalysisRepository
              RETURNING id, created_at, updated_at'
         );
         $stmt->execute([
-            $analysis->urlId,
-            $analysis->responseCode,
-            $analysis->h1,
-            $analysis->title,
-            $analysis->description,
+            $analysis->getUrlId(),
+            $analysis->getResponseCode(),
+            $analysis->getH1(),
+            $analysis->getTitle(),
+            $analysis->getDescription(),
         ]);
         $data = $stmt->fetch();
 
@@ -73,10 +73,10 @@ class UrlAnalysisRepository
              RETURNING updated_at'
         );
         $stmt->execute([
-            $analysis->responseCode,
-            $analysis->h1,
-            $analysis->title,
-            $analysis->description,
+            $analysis->getResponseCode(),
+            $analysis->getH1(),
+            $analysis->getTitle(),
+            $analysis->getDescription(),
             $analysis->getId(),
         ]);
         $data = $stmt->fetch();
