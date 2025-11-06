@@ -12,6 +12,28 @@
 
     <main class="flex-grow-1">
         <div class="container-lg mt-3">
+            {% if flash.success %}
+                <div class="alert alert-success" role="alert">
+                    {{ flash.success }}
+                </div>
+            {% endif %}
+            
+            {% if flash.error %}
+                <div class="alert alert-danger" role="alert">
+                    {{ flash.error }}
+                </div>
+            {% endif %}
+            
+            {% if flash.errors %}
+                <div class="alert alert-danger" role="alert">
+                    <ul class="mb-0">
+                        {% for error in flash.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            
             {% block content %}{% endblock %}
         </div>
     </main>
