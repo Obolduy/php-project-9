@@ -45,19 +45,6 @@ class UrlCheckerService
             ];
         } catch (ConnectException | GuzzleException $e) {
             $result = null;
-        } catch (RequestException $e) {
-            $response = $e->getResponse();
-
-            if ($response instanceof ResponseInterface) {
-                $result = [
-                    'response_code' => $response->getStatusCode(),
-                    'h1' => null,
-                    'title' => null,
-                    'description' => null,
-                ];
-            } else {
-                $result = null;
-            }
         }
 
         return $result;
