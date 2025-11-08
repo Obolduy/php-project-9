@@ -1,9 +1,9 @@
 <?php
 
-namespace Hexlet\Code\Controllers;
+namespace Hexlet\Code\Common\Controllers;
 
+use Hexlet\Code\Common\Services\FlashService;
 use Hexlet\Code\Config\Routes;
-use Hexlet\Code\Services\FlashService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;

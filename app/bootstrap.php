@@ -2,22 +2,22 @@
 
 use DI\Container;
 use Dotenv\Dotenv;
-use Hexlet\Code\Connection;
-use Hexlet\Code\Controllers\HomeController;
-use Hexlet\Code\Controllers\UrlController;
-use Hexlet\Code\Repositories\UrlRepository;
-use Hexlet\Code\Repositories\UrlAnalysisRepository;
-use Hexlet\Code\Services\FlashService;
-use Hexlet\Code\Services\UrlNormalizer;
-use Hexlet\Code\Services\UrlCheckerService;
+use Hexlet\Code\Common\Connection;
+use Hexlet\Code\Common\Controllers\HomeController;
+use Hexlet\Code\Common\Services\FlashService;
 use Hexlet\Code\Twig\RoutesExtension;
-use Hexlet\Code\Validators\UrlValidator;
+use Hexlet\Code\Url\Controllers\UrlController;
+use Hexlet\Code\Url\Repositories\UrlRepository;
+use Hexlet\Code\Url\Services\UrlCheckerService;
+use Hexlet\Code\Url\Services\UrlNormalizer;
+use Hexlet\Code\Url\Validators\UrlValidator;
+use Hexlet\Code\UrlAnalysis\Repositories\UrlAnalysisRepository;
 use Psr\Container\ContainerInterface;
 use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 
-require __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 $dotenv = Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->safeLoad();

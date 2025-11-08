@@ -1,8 +1,8 @@
 <?php
 
-namespace Hexlet\Code\Repositories;
+namespace Hexlet\Code\UrlAnalysis\Repositories;
 
-use Hexlet\Code\Models\UrlAnalysis;
+use Hexlet\Code\UrlAnalysis\Models\UrlAnalysis;
 use PDO;
 
 class UrlAnalysisRepository
@@ -46,8 +46,8 @@ class UrlAnalysisRepository
     private function insert(UrlAnalysis $analysis): void
     {
         $stmt = $this->pdo->prepare(
-            'INSERT INTO urls_analyses (url_id, response_code, h1, title, description, created_at, updated_at) 
-             VALUES (?, ?, ?, ?, ?, NOW(), NOW()) 
+            'INSERT INTO urls_analyses (url_id, response_code, h1, title, description, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, NOW(), NOW())
              RETURNING id, created_at, updated_at'
         );
         $stmt->execute([
@@ -67,8 +67,8 @@ class UrlAnalysisRepository
     private function update(UrlAnalysis $analysis): void
     {
         $stmt = $this->pdo->prepare(
-            'UPDATE urls_analyses 
-             SET response_code = ?, h1 = ?, title = ?, description = ?, updated_at = NOW() 
+            'UPDATE urls_analyses
+             SET response_code = ?, h1 = ?, title = ?, description = ?, updated_at = NOW()
              WHERE id = ?
              RETURNING updated_at'
         );

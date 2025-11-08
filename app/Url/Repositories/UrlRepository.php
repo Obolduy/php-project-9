@@ -1,9 +1,9 @@
 <?php
 
-namespace Hexlet\Code\Repositories;
+namespace Hexlet\Code\Url\Repositories;
 
 use Carbon\Carbon;
-use Hexlet\Code\Models\Url;
+use Hexlet\Code\Url\Models\Url;
 use PDO;
 
 class UrlRepository
@@ -36,7 +36,7 @@ class UrlRepository
     public function findAllWithLatestAnalysis(): array
     {
         $query = '
-            SELECT 
+            SELECT
                 u.id,
                 u.name,
                 u.created_at,
@@ -45,7 +45,7 @@ class UrlRepository
                 latest_analysis.response_code
             FROM urls u
             LEFT JOIN (
-                SELECT DISTINCT ON (url_id) 
+                SELECT DISTINCT ON (url_id)
                     url_id,
                     created_at,
                     response_code
@@ -72,9 +72,7 @@ class UrlRepository
     {
         $now = Carbon::now()->toDateTimeString();
         $stmt = $this->pdo->prepare(
-            'INSERT INTO urls (name, created_at, updated_at) 
-             VALUES (?, ?, ?) 
-             RETURNING id'
+            'INSERT INTO urls (name, created_at, updated_at) VALUES (?, ?, ?) RETURNING id'
         );
         $stmt->execute([$url->getName(), $now, $now]);
         $data = $stmt->fetch();
@@ -87,11 +85,7 @@ class UrlRepository
     private function update(Url $url): void
     {
         $now = Carbon::now()->toDateTimeString();
-        $stmt = $this->pdo->prepare(
-            'UPDATE urls 
-             SET name = ?, updated_at = ? 
-             WHERE id = ?'
-        );
+        $stmt = $this->pdo->prepare('UPDATE urls SET name = ?, updated_at = ? WHERE id = ?');
         $stmt->execute([$url->getName(), $now, $url->getId()]);
 
         $url->setUpdatedAt($now);

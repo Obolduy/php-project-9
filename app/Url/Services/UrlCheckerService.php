@@ -1,12 +1,13 @@
 <?php
 
-namespace Hexlet\Code\Services;
+namespace Hexlet\Code\Url\Services;
 
 use DiDom\Document;
 use DiDom\Element;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\ResponseInterface;
 
@@ -36,27 +37,30 @@ class UrlCheckerService
             $title = $this->extractTitle($body);
             $description = $this->extractDescription($body);
 
-            return [
+            $result = [
                 'response_code' => $statusCode,
                 'h1' => $h1,
                 'title' => $title,
                 'description' => $description,
             ];
         } catch (ConnectException $e) {
-            return null;
-        } catch (RequestException $e) {
+            $result = null;
+        } catch (RequestException | GuzzleException $e) {
             $response = $e->getResponse();
 
             if ($response instanceof ResponseInterface) {
-                return [
+                $result = [
                     'response_code' => $response->getStatusCode(),
                     'h1' => null,
                     'title' => null,
                     'description' => null,
                 ];
+            } else {
+                $result = null;
             }
-            return null;
         }
+
+        return $result;
     }
 
     private function extractH1(string $html): ?string
@@ -66,6 +70,8 @@ class UrlCheckerService
         }
 
         return $this->suppressDeprecations(function () use ($html) {
+            $result = null;
+
             try {
                 $document = new Document($html);
                 $h1Element = $document->first('h1');
@@ -74,14 +80,14 @@ class UrlCheckerService
                     $text = $h1Element->text();
 
                     if ($text) {
-                        return mb_substr(trim($text), 0, 255);
+                        $result = mb_substr(trim($text), 0, 255);
                     }
                 }
-
-                return null;
             } catch (Exception $e) {
-                return null;
+                $result = null;
             }
+
+            return $result;
         });
     }
 
@@ -92,21 +98,24 @@ class UrlCheckerService
         }
 
         return $this->suppressDeprecations(function () use ($html) {
+            $result = null;
+
             try {
                 $document = new Document($html);
                 $titleElement = $document->first('title');
 
                 if ($titleElement instanceof Element) {
                     $text = $titleElement->text();
+
                     if ($text) {
-                        return mb_substr(trim($text), 0, 255);
+                        $result = mb_substr(trim($text), 0, 255);
                     }
                 }
-
-                return null;
             } catch (Exception $e) {
-                return null;
+                $result = null;
             }
+
+            return $result;
         });
     }
 
@@ -117,6 +126,8 @@ class UrlCheckerService
         }
 
         return $this->suppressDeprecations(function () use ($html) {
+            $result = null;
+
             try {
                 $document = new Document($html);
                 $metaElement = $document->first('meta[name="description"]');
@@ -125,14 +136,14 @@ class UrlCheckerService
                     $content = $metaElement->getAttribute('content');
 
                     if ($content) {
-                        return trim($content);
+                        $result = trim($content);
                     }
                 }
-
-                return null;
             } catch (Exception $e) {
-                return null;
+                $result = null;
             }
+
+            return $result;
         });
     }
 

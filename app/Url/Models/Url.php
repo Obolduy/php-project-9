@@ -1,6 +1,6 @@
 <?php
 
-namespace Hexlet\Code\Models;
+namespace Hexlet\Code\Url\Models;
 
 class Url
 {

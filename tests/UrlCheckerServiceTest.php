@@ -2,7 +2,7 @@
 
 namespace Hexlet\Code\Tests;
 
-use Hexlet\Code\Services\UrlCheckerService;
+use Hexlet\Code\Url\Services\UrlCheckerService;
 use PHPUnit\Framework\TestCase;
 
 class UrlCheckerServiceTest extends TestCase

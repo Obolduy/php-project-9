@@ -1,6 +1,6 @@
 <?php
 
-namespace Hexlet\Code\Services;
+namespace Hexlet\Code\Common\Services;
 
 class FlashService
 {

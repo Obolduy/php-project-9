@@ -1,18 +1,20 @@
 <?php
 
-namespace Hexlet\Code\Controllers;
+namespace Hexlet\Code\Url\Controllers;
 
 use Exception;
+use Hexlet\Code\Common\Services\FlashService;
+use Hexlet\Code\Config\ExceptionsTexts;
 use Hexlet\Code\Config\Messages;
 use Hexlet\Code\Config\Routes;
-use Hexlet\Code\Models\UrlAnalysis;
-use Hexlet\Code\Repositories\UrlRepository;
-use Hexlet\Code\Repositories\UrlAnalysisRepository;
-use Hexlet\Code\Services\FlashService;
-use Hexlet\Code\Services\UrlNormalizer;
-use Hexlet\Code\Services\UrlCheckerService;
-use Hexlet\Code\Validators\UrlValidator;
-use Hexlet\Code\Models\Url;
+use Hexlet\Code\Url\Exceptions\UrlStoreValidationException;
+use Hexlet\Code\Url\Models\Url;
+use Hexlet\Code\Url\Repositories\UrlRepository;
+use Hexlet\Code\Url\Services\UrlCheckerService;
+use Hexlet\Code\Url\Services\UrlNormalizer;
+use Hexlet\Code\Url\Validators\UrlValidator;
+use Hexlet\Code\UrlAnalysis\Models\UrlAnalysis;
+use Hexlet\Code\UrlAnalysis\Repositories\UrlAnalysisRepository;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Routing\RouteContext;
@@ -73,45 +75,43 @@ class UrlController
 
         $normalizedUrl = $this->normalizer->normalize($urlName);
 
-        if (!is_string($normalizedUrl)) {
-            $this->flash->set('error', Messages::ERROR_SAVING_URL);
+        if (is_string($normalizedUrl)) {
+            try {
+                $existingUrl = $this->urlRepository->findByName($normalizedUrl);
 
-            return $this->redirectToIndex($request, $response);
-        }
+                if ($existingUrl !== null) {
+                    $this->flash->set('success', Messages::URL_ALREADY_EXISTS);
+                    $existingUrlId = $existingUrl->getId();
 
-        try {
-            $existingUrl = $this->urlRepository->findByName($normalizedUrl);
+                    if ($existingUrlId === null) {
+                        throw new UrlStoreValidationException(ExceptionsTexts::URL_ID_IS_NULL_AT_CREATION);
+                    }
 
-            if ($existingUrl !== null) {
-                $this->flash->set('success', Messages::URL_ALREADY_EXISTS);
+                    $result = $this->redirectToShow($request, $response, $existingUrlId);
+                } else {
+                    $url = new Url(['name' => $normalizedUrl]);
 
-                $existingUrlId = $existingUrl->getId();
+                    $this->urlRepository->save($url);
+                    $this->flash->set('success', Messages::URL_ADDED);
 
-                if ($existingUrlId === null) {
-                    throw new Exception('URL ID cannot be null');
+                    $newUrlId = $url->getId();
+
+                    if ($newUrlId === null) {
+                        throw new UrlStoreValidationException(ExceptionsTexts::URL_ID_IS_NULL_AFTER_SAVE);
+                    }
+
+                    $result = $this->redirectToShow($request, $response, $newUrlId);
                 }
-
-                return $this->redirectToShow($request, $response, $existingUrlId);
+            } catch (Exception $e) {
+                $this->flash->set('error', Messages::ERROR_SAVING_URL);
+                $result = $this->redirectToIndex($request, $response);
             }
-
-            $url = new Url(['name' => $normalizedUrl]);
-
-            $this->urlRepository->save($url);
-
-            $this->flash->set('success', Messages::URL_ADDED);
-
-            $newUrlId = $url->getId();
-
-            if ($newUrlId === null) {
-                throw new Exception('URL ID cannot be null after save');
-            }
-
-            return $this->redirectToShow($request, $response, $newUrlId);
-        } catch (Exception $e) {
+        } else {
             $this->flash->set('error', Messages::ERROR_SAVING_URL);
-
-            return $this->redirectToIndex($request, $response);
+            $result = $this->redirectToIndex($request, $response);
         }
+
+        return $result;
     }
 
     public function index(Request $request, Response $response): Response
@@ -184,35 +184,34 @@ class UrlController
             if ($url === null) {
                 $response->getBody()->write(Messages::URL_NOT_FOUND);
 
-                return $response->withStatus(404);
+                $result = $response->withStatus(404);
+            } else {
+                $checkResult = $this->checker->check($url->getName());
+
+                if ($checkResult === null) {
+                    $this->flash->set('error', Messages::CHECK_NETWORK_ERROR);
+                } else {
+                    $analysis = new UrlAnalysis([
+                        'url_id' => $id,
+                        'response_code' => $checkResult['response_code'],
+                        'h1' => $checkResult['h1'],
+                        'title' => $checkResult['title'],
+                        'description' => $checkResult['description'],
+                    ]);
+
+                    $this->urlAnalysisRepository->save($analysis);
+                    $this->flash->set('success', Messages::CHECK_CREATED);
+                }
+
+                $result = $this->redirectToShow($request, $response, $id);
             }
-
-            $checkResult = $this->checker->check($url->getName());
-
-            if ($checkResult === null) {
-                $this->flash->set('error', Messages::CHECK_NETWORK_ERROR);
-
-                return $this->redirectToShow($request, $response, $id);
-            }
-
-            $analysis = new UrlAnalysis([
-                'url_id' => $id,
-                'response_code' => $checkResult['response_code'],
-                'h1' => $checkResult['h1'],
-                'title' => $checkResult['title'],
-                'description' => $checkResult['description'],
-            ]);
-
-            $this->urlAnalysisRepository->save($analysis);
-
-            $this->flash->set('success', Messages::CHECK_CREATED);
-
-            return $this->redirectToShow($request, $response, $id);
         } catch (Exception $e) {
             $this->flash->set('error', Messages::ERROR_CREATING_CHECK);
 
-            return $this->redirectToShow($request, $response, $id);
+            $result = $this->redirectToShow($request, $response, $id);
         }
+
+        return $result;
     }
 
     private function redirectToShow(Request $request, Response $response, int $id): Response

@@ -1,6 +1,6 @@
 <?php
 
-namespace Hexlet\Code\Models;
+namespace Hexlet\Code\UrlAnalysis\Models;
 
 class UrlAnalysis
 {

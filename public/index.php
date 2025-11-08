@@ -1,8 +1,8 @@
 <?php
 
+use Hexlet\Code\Common\Controllers\HomeController;
 use Hexlet\Code\Config\Routes;
-use Hexlet\Code\Controllers\HomeController;
-use Hexlet\Code\Controllers\UrlController;
+use Hexlet\Code\Url\Controllers\UrlController;
 
 $app = require __DIR__ . '/../app/bootstrap.php';
 

@@ -1,9 +1,9 @@
 <?php
 
-namespace Hexlet\Code\Validators;
+namespace Hexlet\Code\Url\Validators;
 
 use Hexlet\Code\Config\Messages;
-use Hexlet\Code\Services\UrlNormalizer;
+use Hexlet\Code\Url\Services\UrlNormalizer;
 
 class UrlValidator
 {
@@ -24,28 +24,16 @@ class UrlValidator
 
         if (empty($url)) {
             $errors['name'] = Messages::URL_REQUIRED;
-
-            return $errors;
-        }
-
-        if (strlen($url) > self::MAX_LENGTH) {
+        } elseif (strlen($url) > self::MAX_LENGTH) {
             $errors['name'] = sprintf(Messages::URL_TOO_LONG, self::MAX_LENGTH);
+        } else {
+            $normalizedUrl = $this->normalizer->normalize($url);
 
-            return $errors;
-        }
-
-        $normalizedUrl = $this->normalizer->normalize($url);
-
-        if ($normalizedUrl === null) {
-            $errors['name'] = Messages::URL_INVALID;
-
-            return $errors;
-        }
-
-        if (strlen($normalizedUrl) > self::MAX_LENGTH) {
-            $errors['name'] = sprintf(Messages::URL_TOO_LONG, self::MAX_LENGTH);
-
-            return $errors;
+            if ($normalizedUrl === null) {
+                $errors['name'] = Messages::URL_INVALID;
+            } elseif (strlen($normalizedUrl) > self::MAX_LENGTH) {
+                $errors['name'] = sprintf(Messages::URL_TOO_LONG, self::MAX_LENGTH);
+            }
         }
 
         return $errors;
