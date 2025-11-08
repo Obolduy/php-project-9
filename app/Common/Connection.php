@@ -32,7 +32,7 @@ class Connection
 
             $host = $parsedUrl['host'] ?? Config::getDatabaseHost();
             $port = $parsedUrl['port'] ?? Config::getDatabasePort();
-            $dbname = ltrim($parsedUrl['path'] ?? '', '/') ?? Config::getDatabaseName();
+            $dbname = ltrim($parsedUrl['path'] ?? Config::getDatabaseName(), '/');
             $username = $parsedUrl['user'] ?? Config::getDatabaseUser();
             $password = $parsedUrl['pass'] ?? Config::getDatabasePassword();
 

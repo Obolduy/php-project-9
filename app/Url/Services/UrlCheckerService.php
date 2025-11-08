@@ -43,9 +43,9 @@ class UrlCheckerService
                 'title' => $title,
                 'description' => $description,
             ];
-        } catch (ConnectException $e) {
+        } catch (ConnectException | GuzzleException $e) {
             $result = null;
-        } catch (RequestException | GuzzleException $e) {
+        } catch (RequestException $e) {
             $response = $e->getResponse();
 
             if ($response instanceof ResponseInterface) {
