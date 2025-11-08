@@ -73,13 +73,25 @@ class UrlController
 
         $normalizedUrl = $this->normalizer->normalize($urlName);
 
+        if (!is_string($normalizedUrl)) {
+            $this->flash->set('error', Messages::ERROR_SAVING_URL);
+
+            return $this->redirectToIndex($request, $response);
+        }
+
         try {
             $existingUrl = $this->urlRepository->findByName($normalizedUrl);
 
             if ($existingUrl !== null) {
                 $this->flash->set('success', Messages::URL_ALREADY_EXISTS);
 
-                return $this->redirectToShow($request, $response, $existingUrl->getId());
+                $existingUrlId = $existingUrl->getId();
+
+                if ($existingUrlId === null) {
+                    throw new Exception('URL ID cannot be null');
+                }
+
+                return $this->redirectToShow($request, $response, $existingUrlId);
             }
 
             $url = new Url(['name' => $normalizedUrl]);
@@ -88,7 +100,13 @@ class UrlController
 
             $this->flash->set('success', Messages::URL_ADDED);
 
-            return $this->redirectToShow($request, $response, $url->getId());
+            $newUrlId = $url->getId();
+
+            if ($newUrlId === null) {
+                throw new Exception('URL ID cannot be null after save');
+            }
+
+            return $this->redirectToShow($request, $response, $newUrlId);
         } catch (Exception $e) {
             $this->flash->set('error', Messages::ERROR_SAVING_URL);
 
