@@ -3,10 +3,12 @@
 namespace Hexlet\Code\Services;
 
 use DiDom\Document;
+use DiDom\Element;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use Psr\Http\Message\ResponseInterface;
 
 class UrlCheckerService
 {
@@ -43,9 +45,9 @@ class UrlCheckerService
         } catch (ConnectException $e) {
             return null;
         } catch (RequestException $e) {
-            if ($e->hasResponse()) {
-                $response = $e->getResponse();
+            $response = $e->getResponse();
 
+            if ($response instanceof ResponseInterface) {
                 return [
                     'response_code' => $response->getStatusCode(),
                     'h1' => null,
@@ -68,10 +70,12 @@ class UrlCheckerService
                 $document = new Document($html);
                 $h1Element = $document->first('h1');
 
-                $text = optional($h1Element)->text();
+                if ($h1Element instanceof Element) {
+                    $text = $h1Element->text();
 
-                if ($text) {
-                    return mb_substr(trim($text), 0, 255);
+                    if ($text) {
+                        return mb_substr(trim($text), 0, 255);
+                    }
                 }
 
                 return null;
@@ -92,10 +96,11 @@ class UrlCheckerService
                 $document = new Document($html);
                 $titleElement = $document->first('title');
 
-                $text = optional($titleElement)->text();
-
-                if ($text) {
-                    return mb_substr(trim($text), 0, 255);
+                if ($titleElement instanceof Element) {
+                    $text = $titleElement->text();
+                    if ($text) {
+                        return mb_substr(trim($text), 0, 255);
+                    }
                 }
 
                 return null;
@@ -116,10 +121,12 @@ class UrlCheckerService
                 $document = new Document($html);
                 $metaElement = $document->first('meta[name="description"]');
 
-                $content = optional($metaElement)->getAttribute('content');
+                if ($metaElement instanceof Element) {
+                    $content = $metaElement->getAttribute('content');
 
-                if ($content) {
-                    return trim($content);
+                    if ($content) {
+                        return trim($content);
+                    }
                 }
 
                 return null;

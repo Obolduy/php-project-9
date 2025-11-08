@@ -21,10 +21,15 @@ use Slim\Views\Twig;
 class UrlController
 {
     private UrlRepository $urlRepository;
+
     private UrlAnalysisRepository $urlAnalysisRepository;
+
     private UrlValidator $validator;
+
     private UrlNormalizer $normalizer;
+
     private FlashService $flash;
+
     private UrlCheckerService $checker;
 
     public function __construct(
@@ -47,6 +52,7 @@ class UrlController
     {
         $data = $request->getParsedBody();
 
+        /** @var array{url?: array{name?: string}} $data */
         $urlData = $data['url'] ?? [];
         $urlName = trim($urlData['name'] ?? '');
 
@@ -103,7 +109,9 @@ class UrlController
 
             return Twig::fromRequest($request)->render($response, 'urls.twig', $params);
         } catch (Exception $e) {
-            return $response->withStatus(500)->write(Messages::ERROR_LOADING_DATA);
+            $response->getBody()->write(Messages::ERROR_LOADING_DATA);
+
+            return $response->withStatus(500);
         }
     }
 
@@ -115,7 +123,9 @@ class UrlController
             $url = $this->urlRepository->find($id);
 
             if ($url === null) {
-                return $response->withStatus(404)->write(Messages::URL_NOT_FOUND);
+                $response->getBody()->write(Messages::URL_NOT_FOUND);
+
+                return $response->withStatus(404);
             }
 
             $checks = $this->urlAnalysisRepository->findByUrlId($id);
@@ -140,7 +150,9 @@ class UrlController
 
             return Twig::fromRequest($request)->render($response, 'show.twig', $params);
         } catch (Exception $e) {
-            return $response->withStatus(500)->write(Messages::ERROR_LOADING_DATA);
+            $response->getBody()->write(Messages::ERROR_LOADING_DATA);
+
+            return $response->withStatus(500);
         }
     }
 
@@ -152,7 +164,9 @@ class UrlController
             $url = $this->urlRepository->find($id);
 
             if ($url === null) {
-                return $response->withStatus(404)->write(Messages::URL_NOT_FOUND);
+                $response->getBody()->write(Messages::URL_NOT_FOUND);
+
+                return $response->withStatus(404);
             }
 
             $checkResult = $this->checker->check($url->getName());
@@ -185,14 +199,18 @@ class UrlController
 
     private function redirectToShow(Request $request, Response $response, int $id): Response
     {
-        $url = RouteContext::fromRequest($request)->getRouteParser()->urlFor(Routes::URLS_SHOW, ['id' => $id]);
+        $routeParser = RouteContext::fromRequest($request)->getRouteParser();
+
+        $url = $routeParser->urlFor(Routes::URLS_SHOW, ['id' => (string) $id]);
 
         return $response->withHeader('Location', $url)->withStatus(302);
     }
 
     private function redirectToIndex(Request $request, Response $response): Response
     {
-        $url = RouteContext::fromRequest($request)->getRouteParser()->urlFor(Routes::HOME);
+        $routeParser = RouteContext::fromRequest($request)->getRouteParser();
+
+        $url = $routeParser->urlFor(Routes::HOME);
 
         return $response->withHeader('Location', $url)->withStatus(302);
     }
