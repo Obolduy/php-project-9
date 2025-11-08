@@ -101,7 +101,7 @@ class UrlValidatorTest extends TestCase
     {
         $domain = str_repeat('a', 255 - strlen('https://') - strlen('.com'));
         $url = 'https://' . $domain . '.com';
-        
+
         if (strlen($url) <= 255) {
             $errors = $this->validator->validate($url);
             $this->assertEmpty($errors);

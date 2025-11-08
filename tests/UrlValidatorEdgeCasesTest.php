@@ -94,7 +94,7 @@ class UrlValidatorEdgeCasesTest extends TestCase
     {
         $host = str_repeat('a', 254 - strlen('https://') - strlen('.com'));
         $url = 'https://' . $host . '.com';
-        
+
         if (strlen($url) <= 255) {
             $errors = $this->validator->validate($url);
             $this->assertTrue(is_array($errors));

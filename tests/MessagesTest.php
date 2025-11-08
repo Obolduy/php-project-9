@@ -45,7 +45,7 @@ class MessagesTest extends TestCase
     public function testUrlTooLongMessageCanBeFormatted(): void
     {
         $formatted = sprintf(Messages::URL_TOO_LONG, 255);
-        
+
         $this->assertStringContainsString('255', $formatted);
         $this->assertStringNotContainsString('%d', $formatted);
     }

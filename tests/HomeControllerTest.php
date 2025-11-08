@@ -18,6 +18,7 @@ class HomeControllerTest extends TestCase
     protected function setUp(): void
     {
         $_SESSION = [];
+
         $this->flash = new FlashService();
         $this->controller = new HomeController($this->flash);
     }
@@ -31,7 +32,7 @@ class HomeControllerTest extends TestCase
     {
         $request = $this->createMock(ServerRequestInterface::class);
         $response = $this->createMock(ResponseInterface::class);
-        
+
         $view = $this->createMock(Twig::class);
         $view->expects($this->once())
             ->method('render')
@@ -64,7 +65,7 @@ class HomeControllerTest extends TestCase
 
         $request = $this->createMock(ServerRequestInterface::class);
         $response = $this->createMock(ResponseInterface::class);
-        
+
         $view = $this->createMock(Twig::class);
         $view->expects($this->once())
             ->method('render')
@@ -90,7 +91,7 @@ class HomeControllerTest extends TestCase
     {
         $request = $this->createMock(ServerRequestInterface::class);
         $response = $this->createMock(ResponseInterface::class);
-        
+
         $view = $this->createMock(Twig::class);
         $view->expects($this->once())
             ->method('render')
@@ -115,7 +116,7 @@ class HomeControllerTest extends TestCase
     {
         $request = $this->createMock(ServerRequestInterface::class);
         $response = $this->createMock(ResponseInterface::class);
-        
+
         $view = $this->createMock(Twig::class);
         $view->expects($this->once())
             ->method('render')
@@ -140,7 +141,7 @@ class HomeControllerTest extends TestCase
     {
         $request = $this->createMock(ServerRequestInterface::class);
         $response = $this->createMock(ResponseInterface::class);
-        
+
         $view = $this->createMock(Twig::class);
         $view->expects($this->once())
             ->method('render')

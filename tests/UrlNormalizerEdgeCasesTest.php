@@ -112,11 +112,11 @@ class UrlNormalizerEdgeCasesTest extends TestCase
     {
         $longHost = str_repeat('a', 253) . '.com';
         $result = $this->normalizer->normalize('https://' . $longHost);
-        
+
         if ($result !== null) {
             $this->assertStringStartsWith('https://', $result);
         }
-        
+
         $this->assertTrue(true);
     }
 
@@ -136,7 +136,7 @@ class UrlNormalizerEdgeCasesTest extends TestCase
     {
         $result1 = $this->normalizer->normalize('https://Example.COM');
         $result2 = $this->normalizer->normalize('https://example.com');
-        
+
         $this->assertEquals($result1, $result2);
     }
 }

@@ -60,7 +60,7 @@ class ExceptionsTest extends TestCase
         $this->assertIsString(ExceptionsTexts::INVALID_DATABASE_URL);
         $this->assertIsString(ExceptionsTexts::URL_ID_IS_NULL_AT_CREATION);
         $this->assertIsString(ExceptionsTexts::URL_ID_IS_NULL_AFTER_SAVE);
-        
+
         $this->assertNotEmpty(ExceptionsTexts::EMPTY_DATABASE_URL);
         $this->assertNotEmpty(ExceptionsTexts::INVALID_DATABASE_URL);
         $this->assertNotEmpty(ExceptionsTexts::URL_ID_IS_NULL_AT_CREATION);

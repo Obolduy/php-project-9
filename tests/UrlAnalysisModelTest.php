@@ -10,7 +10,7 @@ class UrlAnalysisModelTest extends TestCase
     public function testConstructWithoutData(): void
     {
         $analysis = new UrlAnalysis();
-        
+
         $this->assertNull($analysis->getId());
         $this->assertNull($analysis->getResponseCode());
         $this->assertNull($analysis->getH1());
@@ -32,9 +32,9 @@ class UrlAnalysisModelTest extends TestCase
             'created_at' => '2024-01-01 12:00:00',
             'updated_at' => '2024-01-02 12:00:00',
         ];
-        
+
         $analysis = new UrlAnalysis($data);
-        
+
         $this->assertEquals(1, $analysis->getId());
         $this->assertEquals(5, $analysis->getUrlId());
         $this->assertEquals(200, $analysis->getResponseCode());
@@ -49,7 +49,7 @@ class UrlAnalysisModelTest extends TestCase
     {
         $analysis = new UrlAnalysis();
         $analysis->setId(10);
-        
+
         $this->assertEquals(10, $analysis->getId());
     }
 
@@ -57,7 +57,7 @@ class UrlAnalysisModelTest extends TestCase
     {
         $analysis = new UrlAnalysis();
         $analysis->setUrlId(5);
-        
+
         $this->assertEquals(5, $analysis->getUrlId());
     }
 
@@ -65,7 +65,7 @@ class UrlAnalysisModelTest extends TestCase
     {
         $analysis = new UrlAnalysis();
         $analysis->setResponseCode(404);
-        
+
         $this->assertEquals(404, $analysis->getResponseCode());
     }
 
@@ -73,7 +73,7 @@ class UrlAnalysisModelTest extends TestCase
     {
         $analysis = new UrlAnalysis(['response_code' => 200]);
         $analysis->setResponseCode(null);
-        
+
         $this->assertNull($analysis->getResponseCode());
     }
 
@@ -81,7 +81,7 @@ class UrlAnalysisModelTest extends TestCase
     {
         $analysis = new UrlAnalysis();
         $analysis->setH1('Test H1');
-        
+
         $this->assertEquals('Test H1', $analysis->getH1());
     }
 
@@ -89,7 +89,7 @@ class UrlAnalysisModelTest extends TestCase
     {
         $analysis = new UrlAnalysis(['h1' => 'Old H1']);
         $analysis->setH1(null);
-        
+
         $this->assertNull($analysis->getH1());
     }
 
@@ -97,7 +97,7 @@ class UrlAnalysisModelTest extends TestCase
     {
         $analysis = new UrlAnalysis();
         $analysis->setTitle('Test Title');
-        
+
         $this->assertEquals('Test Title', $analysis->getTitle());
     }
 
@@ -105,7 +105,7 @@ class UrlAnalysisModelTest extends TestCase
     {
         $analysis = new UrlAnalysis(['title' => 'Old Title']);
         $analysis->setTitle(null);
-        
+
         $this->assertNull($analysis->getTitle());
     }
 
@@ -113,7 +113,7 @@ class UrlAnalysisModelTest extends TestCase
     {
         $analysis = new UrlAnalysis();
         $analysis->setDescription('Test Description');
-        
+
         $this->assertEquals('Test Description', $analysis->getDescription());
     }
 
@@ -121,7 +121,7 @@ class UrlAnalysisModelTest extends TestCase
     {
         $analysis = new UrlAnalysis(['description' => 'Old Description']);
         $analysis->setDescription(null);
-        
+
         $this->assertNull($analysis->getDescription());
     }
 
@@ -130,7 +130,7 @@ class UrlAnalysisModelTest extends TestCase
         $analysis = new UrlAnalysis();
         $timestamp = '2024-01-01 12:00:00';
         $analysis->setCreatedAt($timestamp);
-        
+
         $this->assertEquals($timestamp, $analysis->getCreatedAt());
     }
 
@@ -139,7 +139,7 @@ class UrlAnalysisModelTest extends TestCase
         $analysis = new UrlAnalysis();
         $timestamp = '2024-01-02 12:00:00';
         $analysis->setUpdatedAt($timestamp);
-        
+
         $this->assertEquals($timestamp, $analysis->getUpdatedAt());
     }
 
@@ -155,10 +155,10 @@ class UrlAnalysisModelTest extends TestCase
             'created_at' => '2024-01-01 12:00:00',
             'updated_at' => '2024-01-02 12:00:00',
         ];
-        
+
         $analysis = new UrlAnalysis($data);
         $array = $analysis->toArray();
-        
+
         $this->assertEquals($data, $array);
     }
 
@@ -166,7 +166,7 @@ class UrlAnalysisModelTest extends TestCase
     {
         $analysis = new UrlAnalysis(['url_id' => 5, 'response_code' => 200]);
         $array = $analysis->toArray();
-        
+
         $this->assertNull($array['id']);
         $this->assertEquals(5, $array['url_id']);
         $this->assertEquals(200, $array['response_code']);
@@ -184,7 +184,7 @@ class UrlAnalysisModelTest extends TestCase
             'url_id' => '456',
             'response_code' => '200'
         ]);
-        
+
         $this->assertSame(123, $analysis->getId());
         $this->assertSame(456, $analysis->getUrlId());
         $this->assertSame(200, $analysis->getResponseCode());
@@ -198,7 +198,7 @@ class UrlAnalysisModelTest extends TestCase
             'title' => null,
             'description' => null,
         ]);
-        
+
         $this->assertEquals(1, $analysis->getUrlId());
         $this->assertNull($analysis->getH1());
         $this->assertNull($analysis->getTitle());

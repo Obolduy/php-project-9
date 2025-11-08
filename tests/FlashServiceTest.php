@@ -12,6 +12,7 @@ class FlashServiceTest extends TestCase
     protected function setUp(): void
     {
         $_SESSION = [];
+
         $this->flash = new FlashService();
     }
 
@@ -23,7 +24,7 @@ class FlashServiceTest extends TestCase
     public function testSetAddsValueToSession(): void
     {
         $this->flash->set('success', 'Test message');
-        
+
         $this->assertArrayHasKey('flash', $_SESSION);
         $this->assertArrayHasKey('success', $_SESSION['flash']);
         $this->assertEquals('Test message', $_SESSION['flash']['success']);
@@ -32,9 +33,9 @@ class FlashServiceTest extends TestCase
     public function testGetReturnsAndRemovesValue(): void
     {
         $this->flash->set('success', 'Test message');
-        
+
         $value = $this->flash->get('success');
-        
+
         $this->assertEquals('Test message', $value);
         $this->assertArrayNotHasKey('success', $_SESSION['flash'] ?? []);
     }
@@ -42,14 +43,14 @@ class FlashServiceTest extends TestCase
     public function testGetReturnsNullForNonExistentKey(): void
     {
         $value = $this->flash->get('nonexistent');
-        
+
         $this->assertNull($value);
     }
 
     public function testHasReturnsTrueWhenFlashExists(): void
     {
         $this->flash->set('success', 'Test message');
-        
+
         $this->assertTrue($this->flash->has());
     }
 
@@ -62,9 +63,9 @@ class FlashServiceTest extends TestCase
     {
         $this->flash->set('success', 'Success message');
         $this->flash->set('error', 'Error message');
-        
+
         $all = $this->flash->getAll();
-        
+
         $this->assertIsArray($all);
         $this->assertArrayHasKey('success', $all);
         $this->assertArrayHasKey('error', $all);
@@ -75,16 +76,16 @@ class FlashServiceTest extends TestCase
     public function testGetAllRemovesFlashFromSession(): void
     {
         $this->flash->set('success', 'Test message');
-        
+
         $this->flash->getAll();
-        
+
         $this->assertArrayNotHasKey('flash', $_SESSION);
     }
 
     public function testGetAllReturnsEmptyArrayWhenNoFlash(): void
     {
         $all = $this->flash->getAll();
-        
+
         $this->assertIsArray($all);
         $this->assertEmpty($all);
     }
@@ -93,16 +94,16 @@ class FlashServiceTest extends TestCase
     {
         $this->flash->set('success', 'Success message');
         $this->flash->set('error', 'Error message');
-        
+
         $this->flash->clear();
-        
+
         $this->assertArrayNotHasKey('flash', $_SESSION);
     }
 
     public function testClearWhenNoFlashMessages(): void
     {
         $this->flash->clear();
-        
+
         $this->assertArrayNotHasKey('flash', $_SESSION);
     }
 
@@ -110,9 +111,9 @@ class FlashServiceTest extends TestCase
     {
         $this->flash->set('success', 'First message');
         $this->flash->set('success', 'Second message');
-        
+
         $value = $this->flash->get('success');
-        
+
         $this->assertEquals('Second message', $value);
     }
 
@@ -121,7 +122,7 @@ class FlashServiceTest extends TestCase
         $this->flash->set('string', 'text');
         $this->flash->set('number', 123);
         $this->flash->set('array', ['key' => 'value']);
-        
+
         $this->assertEquals('text', $this->flash->get('string'));
         $this->assertEquals(123, $this->flash->get('number'));
         $this->assertEquals(['key' => 'value'], $this->flash->get('array'));

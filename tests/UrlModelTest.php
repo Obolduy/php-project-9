@@ -10,7 +10,7 @@ class UrlModelTest extends TestCase
     public function testConstructWithoutData(): void
     {
         $url = new Url();
-        
+
         $this->assertNull($url->getId());
         $this->assertNull($url->getCreatedAt());
         $this->assertNull($url->getUpdatedAt());
@@ -24,9 +24,9 @@ class UrlModelTest extends TestCase
             'created_at' => '2024-01-01 12:00:00',
             'updated_at' => '2024-01-02 12:00:00',
         ];
-        
+
         $url = new Url($data);
-        
+
         $this->assertEquals(1, $url->getId());
         $this->assertEquals('https://example.com', $url->getName());
         $this->assertEquals('2024-01-01 12:00:00', $url->getCreatedAt());
@@ -37,7 +37,7 @@ class UrlModelTest extends TestCase
     {
         $url = new Url();
         $result = $url->setId(5);
-        
+
         $this->assertSame($url, $result);
         $this->assertEquals(5, $url->getId());
     }
@@ -46,7 +46,7 @@ class UrlModelTest extends TestCase
     {
         $url = new Url();
         $result = $url->setName('https://test.com');
-        
+
         $this->assertSame($url, $result);
         $this->assertEquals('https://test.com', $url->getName());
     }
@@ -56,7 +56,7 @@ class UrlModelTest extends TestCase
         $url = new Url();
         $timestamp = '2024-01-01 12:00:00';
         $result = $url->setCreatedAt($timestamp);
-        
+
         $this->assertSame($url, $result);
         $this->assertEquals($timestamp, $url->getCreatedAt());
     }
@@ -66,7 +66,7 @@ class UrlModelTest extends TestCase
         $url = new Url();
         $timestamp = '2024-01-02 12:00:00';
         $result = $url->setUpdatedAt($timestamp);
-        
+
         $this->assertSame($url, $result);
         $this->assertEquals($timestamp, $url->getUpdatedAt());
     }
@@ -79,10 +79,10 @@ class UrlModelTest extends TestCase
             'created_at' => '2024-01-01 12:00:00',
             'updated_at' => '2024-01-02 12:00:00',
         ];
-        
+
         $url = new Url($data);
         $array = $url->toArray();
-        
+
         $this->assertEquals($data, $array);
     }
 
@@ -90,7 +90,7 @@ class UrlModelTest extends TestCase
     {
         $url = new Url(['name' => 'https://example.com']);
         $array = $url->toArray();
-        
+
         $this->assertNull($array['id']);
         $this->assertEquals('https://example.com', $array['name']);
         $this->assertNull($array['created_at']);
@@ -100,13 +100,13 @@ class UrlModelTest extends TestCase
     public function testChainedSetters(): void
     {
         $url = new Url();
-        
+
         $result = $url
             ->setId(1)
             ->setName('https://example.com')
             ->setCreatedAt('2024-01-01 12:00:00')
             ->setUpdatedAt('2024-01-02 12:00:00');
-        
+
         $this->assertSame($url, $result);
         $this->assertEquals(1, $url->getId());
         $this->assertEquals('https://example.com', $url->getName());
@@ -115,7 +115,7 @@ class UrlModelTest extends TestCase
     public function testConstructWithStringId(): void
     {
         $url = new Url(['id' => '123']);
-        
+
         $this->assertSame(123, $url->getId());
     }
 }
