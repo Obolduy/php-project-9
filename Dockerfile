@@ -1,4 +1,4 @@
-FROM php:8.4-fpm
+FROM php:8.4-cli
 
 RUN apt-get update && apt-get install -y \
     libzip-dev \
@@ -21,9 +21,8 @@ RUN composer install --no-dev --no-scripts --no-autoloader
 
 COPY . .
 
-RUN composer dump-autoload --optimize \
-    && chown -R www-data:www-data /app
+RUN composer dump-autoload --optimize
 
-EXPOSE 9000
+EXPOSE 8080
 
-CMD ["php-fpm"]
+CMD ["php", "-S", "0.0.0.0:8080", "-t", "public"]
