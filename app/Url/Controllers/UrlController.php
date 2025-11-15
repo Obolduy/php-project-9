@@ -86,7 +86,13 @@ class UrlController
                     $url = $this->urlService->createUrl($normalizedUrl);
                     $this->flash->addMessage('success', Messages::URL_ADDED);
 
-                    $result = $this->redirectToShow($request, $response, $url->getId());
+                    $urlId = $url->getId();
+
+                    if ($urlId === null) {
+                        throw new UrlStoreValidationException(ExceptionsTexts::URL_ID_IS_NULL_AT_CREATION);
+                    }
+
+                    $result = $this->redirectToShow($request, $response, $urlId);
                 }
             } catch (Exception $e) {
                 $this->flash->addMessage('error', Messages::ERROR_SAVING_URL);
