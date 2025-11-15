@@ -8,8 +8,6 @@ use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Exception\RequestException;
-use Psr\Http\Message\ResponseInterface;
 
 class UrlCheckerService
 {
@@ -71,7 +69,6 @@ class UrlCheckerService
                     }
                 }
             } catch (Exception $e) {
-                $result = null;
             }
 
             return $result;
@@ -99,7 +96,6 @@ class UrlCheckerService
                     }
                 }
             } catch (Exception $e) {
-                $result = null;
             }
 
             return $result;
@@ -127,7 +123,6 @@ class UrlCheckerService
                     }
                 }
             } catch (Exception $e) {
-                $result = null;
             }
 
             return $result;

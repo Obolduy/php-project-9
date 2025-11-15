@@ -21,20 +21,21 @@ class UrlRepositoryTest extends TestCase
 
     public function testFindReturnsUrlWhenExists(): void
     {
-        $expectedData = [
+        $expectedUrl = Url::fromArray([
             'id' => 1,
             'name' => 'https://example.com',
             'created_at' => '2024-01-01 12:00:00',
             'updated_at' => '2024-01-01 12:00:00',
-        ];
+        ]);
 
         $stmt = $this->createMock(PDOStatement::class);
         $stmt->expects($this->once())
             ->method('execute')
             ->with([1]);
         $stmt->expects($this->once())
-            ->method('fetch')
-            ->willReturn($expectedData);
+            ->method('fetchObject')
+            ->with(Url::class)
+            ->willReturn($expectedUrl);
 
         $this->pdo->expects($this->once())
             ->method('prepare')
@@ -55,7 +56,8 @@ class UrlRepositoryTest extends TestCase
             ->method('execute')
             ->with([999]);
         $stmt->expects($this->once())
-            ->method('fetch')
+            ->method('fetchObject')
+            ->with(Url::class)
             ->willReturn(false);
 
         $this->pdo->expects($this->once())
@@ -103,7 +105,8 @@ class UrlRepositoryTest extends TestCase
             ->method('execute')
             ->with(['https://nonexistent.com']);
         $stmt->expects($this->once())
-            ->method('fetch')
+            ->method('fetchObject')
+            ->with(Url::class)
             ->willReturn(false);
 
         $this->pdo->expects($this->once())
@@ -157,7 +160,7 @@ class UrlRepositoryTest extends TestCase
 
     public function testSaveCallsInsertForNewUrl(): void
     {
-        $url = new Url(['name' => 'https://example.com']);
+        $url = Url::fromArray(['name' => 'https://example.com']);
 
         $stmt = $this->createMock(PDOStatement::class);
         $stmt->expects($this->once())
@@ -185,7 +188,7 @@ class UrlRepositoryTest extends TestCase
 
     public function testSaveCallsUpdateForExistingUrl(): void
     {
-        $url = new Url([
+        $url = Url::fromArray([
             'id' => 1,
             'name' => 'https://example.com',
             'created_at' => '2024-01-01 12:00:00',

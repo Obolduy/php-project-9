@@ -25,7 +25,7 @@ class UrlModelTest extends TestCase
             'updated_at' => '2024-01-02 12:00:00',
         ];
 
-        $url = new Url($data);
+        $url = Url::fromArray($data);
 
         $this->assertEquals(1, $url->getId());
         $this->assertEquals('https://example.com', $url->getName());
@@ -80,7 +80,7 @@ class UrlModelTest extends TestCase
             'updated_at' => '2024-01-02 12:00:00',
         ];
 
-        $url = new Url($data);
+        $url = Url::fromArray($data);
         $array = $url->toArray();
 
         $this->assertEquals($data, $array);
@@ -88,7 +88,7 @@ class UrlModelTest extends TestCase
 
     public function testToArrayWithPartialData(): void
     {
-        $url = new Url(['name' => 'https://example.com']);
+        $url = Url::fromArray(['name' => 'https://example.com']);
         $array = $url->toArray();
 
         $this->assertNull($array['id']);
@@ -114,7 +114,7 @@ class UrlModelTest extends TestCase
 
     public function testConstructWithStringId(): void
     {
-        $url = new Url(['id' => '123']);
+        $url = Url::fromArray(['id' => '123']);
 
         $this->assertSame(123, $url->getId());
     }

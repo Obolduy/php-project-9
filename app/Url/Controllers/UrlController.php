@@ -3,51 +3,45 @@
 namespace Hexlet\Code\Url\Controllers;
 
 use Exception;
-use Hexlet\Code\Common\Services\FlashService;
 use Hexlet\Code\Config\ExceptionsTexts;
 use Hexlet\Code\Config\Messages;
 use Hexlet\Code\Config\Routes;
 use Hexlet\Code\Url\Exceptions\UrlStoreValidationException;
-use Hexlet\Code\Url\Models\Url;
-use Hexlet\Code\Url\Repositories\UrlRepository;
-use Hexlet\Code\Url\Services\UrlCheckerService;
-use Hexlet\Code\Url\Services\UrlNormalizer;
-use Hexlet\Code\Url\Validators\UrlValidator;
-use Hexlet\Code\UrlAnalysis\Models\UrlAnalysis;
-use Hexlet\Code\UrlAnalysis\Repositories\UrlAnalysisRepository;
+use Hexlet\Code\Url\Services\UrlService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Flash\Messages as FlashMessages;
 use Slim\Routing\RouteContext;
 use Slim\Views\Twig;
 
 class UrlController
 {
-    private UrlRepository $urlRepository;
+    private UrlService $urlService;
+    private FlashMessages $flash;
 
-    private UrlAnalysisRepository $urlAnalysisRepository;
-
-    private UrlValidator $validator;
-
-    private UrlNormalizer $normalizer;
-
-    private FlashService $flash;
-
-    private UrlCheckerService $checker;
-
-    public function __construct(
-        UrlRepository $urlRepository,
-        UrlAnalysisRepository $urlAnalysisRepository,
-        UrlValidator $validator,
-        UrlNormalizer $normalizer,
-        FlashService $flash,
-        UrlCheckerService $checker
-    ) {
-        $this->urlRepository = $urlRepository;
-        $this->urlAnalysisRepository = $urlAnalysisRepository;
-        $this->validator = $validator;
-        $this->normalizer = $normalizer;
+    public function __construct(UrlService $urlService, FlashMessages $flash)
+    {
+        $this->urlService = $urlService;
         $this->flash = $flash;
-        $this->checker = $checker;
+    }
+
+    public function index(Request $request, Response $response): Response
+    {
+        try {
+            $urls = $this->urlService->findAllUrlsWithLatestAnalysis();
+
+            $params = [
+                'urls' => $urls,
+                'flash' => $this->flash->getMessages(),
+                'currentRoute' => Routes::URLS_INDEX
+            ];
+
+            return Twig::fromRequest($request)->render($response, 'urls/urls.twig', $params);
+        } catch (Exception $e) {
+            $response->getBody()->write(Messages::ERROR_LOADING_DATA);
+
+            return $response->withStatus(500);
+        }
     }
 
     public function store(Request $request, Response $response): Response
@@ -58,12 +52,12 @@ class UrlController
         $urlData = $data['url'] ?? [];
         $urlName = trim($urlData['name'] ?? '');
 
-        $errors = $this->validator->validate($urlName);
+        $errors = $this->urlService->validateUrl($urlName);
 
         if (!empty($errors)) {
             return Twig::fromRequest($request)->render(
                 $response->withStatus(422),
-                'index.twig',
+                'urls/index.twig',
                 [
                     'errors' => $errors,
                     'url' => $urlData,
@@ -73,14 +67,14 @@ class UrlController
             );
         }
 
-        $normalizedUrl = $this->normalizer->normalize($urlName);
+        $normalizedUrl = $this->urlService->normalizeUrl($urlName);
 
         if (is_string($normalizedUrl)) {
             try {
-                $existingUrl = $this->urlRepository->findByName($normalizedUrl);
+                $existingUrl = $this->urlService->findUrlByName($normalizedUrl);
 
                 if ($existingUrl !== null) {
-                    $this->flash->set('success', Messages::URL_ALREADY_EXISTS);
+                    $this->flash->addMessage('success', Messages::URL_ALREADY_EXISTS);
                     $existingUrlId = $existingUrl->getId();
 
                     if ($existingUrlId === null) {
@@ -89,48 +83,21 @@ class UrlController
 
                     $result = $this->redirectToShow($request, $response, $existingUrlId);
                 } else {
-                    $url = new Url(['name' => $normalizedUrl]);
+                    $url = $this->urlService->createUrl($normalizedUrl);
+                    $this->flash->addMessage('success', Messages::URL_ADDED);
 
-                    $this->urlRepository->save($url);
-                    $this->flash->set('success', Messages::URL_ADDED);
-
-                    $newUrlId = $url->getId();
-
-                    if ($newUrlId === null) {
-                        throw new UrlStoreValidationException(ExceptionsTexts::URL_ID_IS_NULL_AFTER_SAVE);
-                    }
-
-                    $result = $this->redirectToShow($request, $response, $newUrlId);
+                    $result = $this->redirectToShow($request, $response, $url->getId());
                 }
             } catch (Exception $e) {
-                $this->flash->set('error', Messages::ERROR_SAVING_URL);
+                $this->flash->addMessage('error', Messages::ERROR_SAVING_URL);
                 $result = $this->redirectToIndex($request, $response);
             }
         } else {
-            $this->flash->set('error', Messages::ERROR_SAVING_URL);
+            $this->flash->addMessage('error', Messages::ERROR_SAVING_URL);
             $result = $this->redirectToIndex($request, $response);
         }
 
         return $result;
-    }
-
-    public function index(Request $request, Response $response): Response
-    {
-        try {
-            $urls = $this->urlRepository->findAllWithLatestAnalysis();
-
-            $params = [
-                'urls' => $urls,
-                'flash' => $this->flash->getAll(),
-                'currentRoute' => Routes::URLS_INDEX
-            ];
-
-            return Twig::fromRequest($request)->render($response, 'urls.twig', $params);
-        } catch (Exception $e) {
-            $response->getBody()->write(Messages::ERROR_LOADING_DATA);
-
-            return $response->withStatus(500);
-        }
     }
 
     public function show(Request $request, Response $response, array $args): Response
@@ -138,7 +105,7 @@ class UrlController
         $id = (int) $args['id'];
 
         try {
-            $url = $this->urlRepository->find($id);
+            $url = $this->urlService->findUrl($id);
 
             if ($url === null) {
                 $response->getBody()->write(Messages::URL_NOT_FOUND);
@@ -146,7 +113,7 @@ class UrlController
                 return $response->withStatus(404);
             }
 
-            $checks = $this->urlAnalysisRepository->findByUrlId($id);
+            $checks = $this->urlService->findAnalysesByUrlId($id);
 
             $params = [
                 'url' => [
@@ -162,11 +129,11 @@ class UrlController
                     'description' => $check->getDescription(),
                     'createdAt' => $check->getCreatedAt()
                 ], $checks),
-                'flash' => $this->flash->getAll(),
+                'flash' => $this->flash->getMessages(),
                 'currentRoute' => Routes::URLS_SHOW
             ];
 
-            return Twig::fromRequest($request)->render($response, 'show.twig', $params);
+            return Twig::fromRequest($request)->render($response, 'urls/show.twig', $params);
         } catch (Exception $e) {
             $response->getBody()->write(Messages::ERROR_LOADING_DATA);
 
@@ -179,34 +146,25 @@ class UrlController
         $id = (int) $args['id'];
 
         try {
-            $url = $this->urlRepository->find($id);
+            $url = $this->urlService->findUrl($id);
 
             if ($url === null) {
                 $response->getBody()->write(Messages::URL_NOT_FOUND);
 
                 $result = $response->withStatus(404);
             } else {
-                $checkResult = $this->checker->check($url->getName());
+                $analysis = $this->urlService->checkUrl($id, $url->getName());
 
-                if ($checkResult === null) {
-                    $this->flash->set('error', Messages::CHECK_NETWORK_ERROR);
+                if ($analysis === null) {
+                    $this->flash->addMessage('error', Messages::CHECK_NETWORK_ERROR);
                 } else {
-                    $analysis = new UrlAnalysis([
-                        'url_id' => $id,
-                        'response_code' => $checkResult['response_code'],
-                        'h1' => $checkResult['h1'],
-                        'title' => $checkResult['title'],
-                        'description' => $checkResult['description'],
-                    ]);
-
-                    $this->urlAnalysisRepository->save($analysis);
-                    $this->flash->set('success', Messages::CHECK_CREATED);
+                    $this->flash->addMessage('success', Messages::CHECK_CREATED);
                 }
 
                 $result = $this->redirectToShow($request, $response, $id);
             }
         } catch (Exception $e) {
-            $this->flash->set('error', Messages::ERROR_CREATING_CHECK);
+            $this->flash->addMessage('error', Messages::ERROR_CREATING_CHECK);
 
             $result = $this->redirectToShow($request, $response, $id);
         }

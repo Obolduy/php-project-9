@@ -33,7 +33,7 @@ class UrlAnalysisModelTest extends TestCase
             'updated_at' => '2024-01-02 12:00:00',
         ];
 
-        $analysis = new UrlAnalysis($data);
+        $analysis = UrlAnalysis::fromArray($data);
 
         $this->assertEquals(1, $analysis->getId());
         $this->assertEquals(5, $analysis->getUrlId());
@@ -71,7 +71,7 @@ class UrlAnalysisModelTest extends TestCase
 
     public function testSetResponseCodeToNull(): void
     {
-        $analysis = new UrlAnalysis(['response_code' => 200]);
+        $analysis = UrlAnalysis::fromArray(['response_code' => 200]);
         $analysis->setResponseCode(null);
 
         $this->assertNull($analysis->getResponseCode());
@@ -87,7 +87,7 @@ class UrlAnalysisModelTest extends TestCase
 
     public function testSetH1ToNull(): void
     {
-        $analysis = new UrlAnalysis(['h1' => 'Old H1']);
+        $analysis = UrlAnalysis::fromArray(['h1' => 'Old H1']);
         $analysis->setH1(null);
 
         $this->assertNull($analysis->getH1());
@@ -103,7 +103,7 @@ class UrlAnalysisModelTest extends TestCase
 
     public function testSetTitleToNull(): void
     {
-        $analysis = new UrlAnalysis(['title' => 'Old Title']);
+        $analysis = UrlAnalysis::fromArray(['title' => 'Old Title']);
         $analysis->setTitle(null);
 
         $this->assertNull($analysis->getTitle());
@@ -119,7 +119,7 @@ class UrlAnalysisModelTest extends TestCase
 
     public function testSetDescriptionToNull(): void
     {
-        $analysis = new UrlAnalysis(['description' => 'Old Description']);
+        $analysis = UrlAnalysis::fromArray(['description' => 'Old Description']);
         $analysis->setDescription(null);
 
         $this->assertNull($analysis->getDescription());
@@ -156,7 +156,7 @@ class UrlAnalysisModelTest extends TestCase
             'updated_at' => '2024-01-02 12:00:00',
         ];
 
-        $analysis = new UrlAnalysis($data);
+        $analysis = UrlAnalysis::fromArray($data);
         $array = $analysis->toArray();
 
         $this->assertEquals($data, $array);
@@ -164,7 +164,7 @@ class UrlAnalysisModelTest extends TestCase
 
     public function testToArrayWithPartialData(): void
     {
-        $analysis = new UrlAnalysis(['url_id' => 5, 'response_code' => 200]);
+        $analysis = UrlAnalysis::fromArray(['url_id' => 5, 'response_code' => 200]);
         $array = $analysis->toArray();
 
         $this->assertNull($array['id']);
@@ -179,7 +179,7 @@ class UrlAnalysisModelTest extends TestCase
 
     public function testConstructWithStringIds(): void
     {
-        $analysis = new UrlAnalysis([
+        $analysis = UrlAnalysis::fromArray([
             'id' => '123',
             'url_id' => '456',
             'response_code' => '200'
@@ -192,7 +192,7 @@ class UrlAnalysisModelTest extends TestCase
 
     public function testConstructWithNullableFields(): void
     {
-        $analysis = new UrlAnalysis([
+        $analysis = UrlAnalysis::fromArray([
             'url_id' => 1,
             'h1' => null,
             'title' => null,

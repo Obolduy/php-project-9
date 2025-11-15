@@ -19,44 +19,53 @@ class UrlRepository
     {
         $stmt = $this->pdo->prepare('SELECT * FROM urls WHERE id = ?');
         $stmt->execute([$id]);
-        $data = $stmt->fetch();
+        $result = $stmt->fetchObject(Url::class);
 
-        return $data ? new Url($data) : null;
+        return $result !== false ? $result : null;
     }
 
     public function findByName(string $name): ?Url
     {
         $stmt = $this->pdo->prepare('SELECT * FROM urls WHERE name = ?');
         $stmt->execute([$name]);
-        $data = $stmt->fetch();
+        $result = $stmt->fetchObject(Url::class);
 
-        return $data ? new Url($data) : null;
+        return $result !== false ? $result : null;
     }
 
     public function findAllWithLatestAnalysis(): array
     {
-        $query = '
-            SELECT
-                u.id,
-                u.name,
-                u.created_at,
-                u.updated_at,
-                latest_analysis.created_at as last_check_at,
-                latest_analysis.response_code
-            FROM urls u
-            LEFT JOIN (
-                SELECT DISTINCT ON (url_id)
-                    url_id,
-                    created_at,
-                    response_code
-                FROM urls_analyses
-                ORDER BY url_id, created_at DESC
-            ) latest_analysis ON latest_analysis.url_id = u.id
-            ORDER BY u.id DESC
-        ';
+        $urlsQuery = 'SELECT id, name, created_at, updated_at FROM urls ORDER BY id DESC';
+        $urlsStmt = $this->pdo->query($urlsQuery);
+        $urls = $urlsStmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $stmt = $this->pdo->query($query);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $analysisQuery = '
+            SELECT DISTINCT ON (url_id)
+                url_id,
+                created_at,
+                response_code
+            FROM urls_analyses
+            ORDER BY url_id, created_at DESC
+        ';
+        $analysisStmt = $this->pdo->query($analysisQuery);
+        $analyses = $analysisStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $analysesByUrlId = [];
+        foreach ($analyses as $analysis) {
+            $analysesByUrlId[$analysis['url_id']] = $analysis;
+        }
+
+        foreach ($urls as &$url) {
+            if (isset($analysesByUrlId[$url['id']])) {
+                $url['last_check_at'] = $analysesByUrlId[$url['id']]['created_at'];
+                $url['response_code'] = $analysesByUrlId[$url['id']]['response_code'];
+            } else {
+                $url['last_check_at'] = null;
+                $url['response_code'] = null;
+            }
+        }
+
+        return $urls;
     }
 
     public function save(Url $url): void

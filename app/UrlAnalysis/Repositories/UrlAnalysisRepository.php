@@ -18,9 +18,9 @@ class UrlAnalysisRepository
     {
         $stmt = $this->pdo->prepare('SELECT * FROM urls_analyses WHERE id = ?');
         $stmt->execute([$id]);
-        $data = $stmt->fetch();
+        $result = $stmt->fetchObject(UrlAnalysis::class);
 
-        return $data ? new UrlAnalysis($data) : null;
+        return $result !== false ? $result : null;
     }
 
     public function findByUrlId(int $urlId): array
@@ -29,9 +29,13 @@ class UrlAnalysisRepository
             'SELECT * FROM urls_analyses WHERE url_id = ? ORDER BY created_at DESC'
         );
         $stmt->execute([$urlId]);
-        $rows = $stmt->fetchAll();
+        
+        $results = [];
+        while ($obj = $stmt->fetchObject(UrlAnalysis::class)) {
+            $results[] = $obj;
+        }
 
-        return array_map(fn($row) => new UrlAnalysis($row), $rows);
+        return $results;
     }
 
     public function save(UrlAnalysis $analysis): void

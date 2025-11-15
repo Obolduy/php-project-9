@@ -142,7 +142,7 @@ class UrlAnalysisRepositoryTest extends TestCase
 
     public function testSaveCallsInsertForNewAnalysis(): void
     {
-        $analysis = new UrlAnalysis([
+        $analysis = UrlAnalysis::fromArray([
             'url_id' => 5,
             'response_code' => 200,
             'h1' => 'Test H1',
@@ -176,7 +176,7 @@ class UrlAnalysisRepositoryTest extends TestCase
 
     public function testSaveCallsUpdateForExistingAnalysis(): void
     {
-        $analysis = new UrlAnalysis([
+        $analysis = UrlAnalysis::fromArray([
             'id' => 1,
             'url_id' => 5,
             'response_code' => 404,
@@ -220,7 +220,7 @@ class UrlAnalysisRepositoryTest extends TestCase
 
     public function testSaveHandlesNullableFields(): void
     {
-        $analysis = new UrlAnalysis([
+        $analysis = UrlAnalysis::fromArray([
             'url_id' => 5,
             'response_code' => 200,
             'h1' => null,

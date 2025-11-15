@@ -4,16 +4,17 @@ use DI\Container;
 use Dotenv\Dotenv;
 use Hexlet\Code\Common\Connection;
 use Hexlet\Code\Common\Controllers\HomeController;
-use Hexlet\Code\Common\Services\FlashService;
 use Hexlet\Code\Twig\RoutesExtension;
 use Hexlet\Code\Url\Controllers\UrlController;
 use Hexlet\Code\Url\Repositories\UrlRepository;
 use Hexlet\Code\Url\Services\UrlCheckerService;
 use Hexlet\Code\Url\Services\UrlNormalizer;
+use Hexlet\Code\Url\Services\UrlService;
 use Hexlet\Code\Url\Validators\UrlValidator;
 use Hexlet\Code\UrlAnalysis\Repositories\UrlAnalysisRepository;
 use Psr\Container\ContainerInterface;
 use Slim\Factory\AppFactory;
+use Slim\Flash\Messages as FlashMessages;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 
@@ -28,8 +29,8 @@ if (session_status() === PHP_SESSION_NONE) {
 
 $container = new Container();
 
-$container->set(FlashService::class, function () {
-    return new FlashService();
+$container->set(FlashMessages::class, function () {
+    return new FlashMessages();
 });
 
 $container->set(UrlNormalizer::class, function () {
@@ -54,18 +55,24 @@ $container->set(UrlCheckerService::class, function () {
     return new UrlCheckerService();
 });
 
-$container->set(HomeController::class, function (ContainerInterface $c) {
-    return new HomeController($c->get(FlashService::class));
-});
-
-$container->set(UrlController::class, function (ContainerInterface $c) {
-    return new UrlController(
+$container->set(UrlService::class, function (ContainerInterface $c) {
+    return new UrlService(
         $c->get(UrlRepository::class),
         $c->get(UrlAnalysisRepository::class),
         $c->get(UrlValidator::class),
         $c->get(UrlNormalizer::class),
-        $c->get(FlashService::class),
         $c->get(UrlCheckerService::class)
+    );
+});
+
+$container->set(HomeController::class, function (ContainerInterface $c) {
+    return new HomeController($c->get(FlashMessages::class));
+});
+
+$container->set(UrlController::class, function (ContainerInterface $c) {
+    return new UrlController(
+        $c->get(UrlService::class),
+        $c->get(FlashMessages::class)
     );
 });
 

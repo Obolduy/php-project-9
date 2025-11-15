@@ -3,23 +3,23 @@
 namespace Hexlet\Code\Tests;
 
 use Hexlet\Code\Common\Controllers\HomeController;
-use Hexlet\Code\Common\Services\FlashService;
 use Hexlet\Code\Config\Routes;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Slim\Flash\Messages as FlashMessages;
 use Slim\Views\Twig;
 
 class HomeControllerTest extends TestCase
 {
     private HomeController $controller;
-    private FlashService $flash;
+    private FlashMessages $flash;
 
     protected function setUp(): void
     {
         $_SESSION = [];
 
-        $this->flash = new FlashService();
+        $this->flash = new FlashMessages();
         $this->controller = new HomeController($this->flash);
     }
 
@@ -38,7 +38,7 @@ class HomeControllerTest extends TestCase
             ->method('render')
             ->with(
                 $response,
-                'index.twig',
+                'urls/index.twig',
                 $this->callback(function ($params) {
                     return isset($params['flash']) &&
                            isset($params['errors']) &&
@@ -61,7 +61,7 @@ class HomeControllerTest extends TestCase
 
     public function testIndexIncludesFlashMessages(): void
     {
-        $this->flash->set('success', 'Test message');
+        $this->flash->addMessage('success', 'Test message');
 
         $request = $this->createMock(ServerRequestInterface::class);
         $response = $this->createMock(ResponseInterface::class);
@@ -71,10 +71,11 @@ class HomeControllerTest extends TestCase
             ->method('render')
             ->with(
                 $response,
-                'index.twig',
+                'urls/index.twig',
                 $this->callback(function ($params) {
                     return isset($params['flash']['success']) &&
-                           $params['flash']['success'] === 'Test message';
+                           is_array($params['flash']['success']) &&
+                           in_array('Test message', $params['flash']['success']);
                 })
             )
             ->willReturn($response);
@@ -97,7 +98,7 @@ class HomeControllerTest extends TestCase
             ->method('render')
             ->with(
                 $response,
-                'index.twig',
+                'urls/index.twig',
                 $this->callback(function ($params) {
                     return is_array($params['errors']) && empty($params['errors']);
                 })
@@ -122,7 +123,7 @@ class HomeControllerTest extends TestCase
             ->method('render')
             ->with(
                 $response,
-                'index.twig',
+                'urls/index.twig',
                 $this->callback(function ($params) {
                     return is_array($params['url']) && empty($params['url']);
                 })
@@ -147,7 +148,7 @@ class HomeControllerTest extends TestCase
             ->method('render')
             ->with(
                 $response,
-                'index.twig',
+                'urls/index.twig',
                 $this->callback(function ($params) {
                     return $params['currentRoute'] === Routes::HOME;
                 })
