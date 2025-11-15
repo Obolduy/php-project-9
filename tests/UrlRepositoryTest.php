@@ -72,20 +72,21 @@ class UrlRepositoryTest extends TestCase
 
     public function testFindByNameReturnsUrlWhenExists(): void
     {
-        $expectedData = [
+        $expectedUrl = Url::fromArray([
             'id' => 1,
             'name' => 'https://example.com',
             'created_at' => '2024-01-01 12:00:00',
             'updated_at' => '2024-01-01 12:00:00',
-        ];
+        ]);
 
         $stmt = $this->createMock(PDOStatement::class);
         $stmt->expects($this->once())
             ->method('execute')
             ->with(['https://example.com']);
         $stmt->expects($this->once())
-            ->method('fetch')
-            ->willReturn($expectedData);
+            ->method('fetchObject')
+            ->with(Url::class)
+            ->willReturn($expectedUrl);
 
         $this->pdo->expects($this->once())
             ->method('prepare')
@@ -121,34 +122,44 @@ class UrlRepositoryTest extends TestCase
 
     public function testFindAllWithLatestAnalysisReturnsArray(): void
     {
-        $expectedData = [
+        $urlsData = [
             [
                 'id' => 1,
                 'name' => 'https://example.com',
                 'created_at' => '2024-01-01 12:00:00',
                 'updated_at' => '2024-01-01 12:00:00',
-                'last_check_at' => '2024-01-02 12:00:00',
-                'response_code' => 200,
             ],
             [
                 'id' => 2,
                 'name' => 'https://test.com',
                 'created_at' => '2024-01-01 13:00:00',
                 'updated_at' => '2024-01-01 13:00:00',
-                'last_check_at' => null,
-                'response_code' => null,
             ],
         ];
 
-        $stmt = $this->createMock(PDOStatement::class);
-        $stmt->expects($this->once())
+        $analysesData = [
+            [
+                'url_id' => 1,
+                'created_at' => '2024-01-02 12:00:00',
+                'response_code' => 200,
+            ],
+        ];
+
+        $urlsStmt = $this->createMock(PDOStatement::class);
+        $urlsStmt->expects($this->once())
             ->method('fetchAll')
             ->with(PDO::FETCH_ASSOC)
-            ->willReturn($expectedData);
+            ->willReturn($urlsData);
 
-        $this->pdo->expects($this->once())
+        $analysesStmt = $this->createMock(PDOStatement::class);
+        $analysesStmt->expects($this->once())
+            ->method('fetchAll')
+            ->with(PDO::FETCH_ASSOC)
+            ->willReturn($analysesData);
+
+        $this->pdo->expects($this->exactly(2))
             ->method('query')
-            ->willReturn($stmt);
+            ->willReturnOnConsecutiveCalls($urlsStmt, $analysesStmt);
 
         $result = $this->repository->findAllWithLatestAnalysis();
 
@@ -156,6 +167,8 @@ class UrlRepositoryTest extends TestCase
         $this->assertCount(2, $result);
         $this->assertEquals('https://example.com', $result[0]['name']);
         $this->assertEquals(200, $result[0]['response_code']);
+        $this->assertEquals('2024-01-02 12:00:00', $result[0]['last_check_at']);
+        $this->assertNull($result[1]['response_code']);
     }
 
     public function testSaveCallsInsertForNewUrl(): void

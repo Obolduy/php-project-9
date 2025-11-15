@@ -21,7 +21,7 @@ class UrlAnalysisRepositoryTest extends TestCase
 
     public function testFindReturnsAnalysisWhenExists(): void
     {
-        $expectedData = [
+        $expectedAnalysis = UrlAnalysis::fromArray([
             'id' => 1,
             'url_id' => 5,
             'response_code' => 200,
@@ -30,15 +30,16 @@ class UrlAnalysisRepositoryTest extends TestCase
             'description' => 'Page description',
             'created_at' => '2024-01-01 12:00:00',
             'updated_at' => '2024-01-01 12:00:00',
-        ];
+        ]);
 
         $stmt = $this->createMock(PDOStatement::class);
         $stmt->expects($this->once())
             ->method('execute')
             ->with([1]);
         $stmt->expects($this->once())
-            ->method('fetch')
-            ->willReturn($expectedData);
+            ->method('fetchObject')
+            ->with(UrlAnalysis::class)
+            ->willReturn($expectedAnalysis);
 
         $this->pdo->expects($this->once())
             ->method('prepare')
@@ -60,7 +61,8 @@ class UrlAnalysisRepositoryTest extends TestCase
             ->method('execute')
             ->with([999]);
         $stmt->expects($this->once())
-            ->method('fetch')
+            ->method('fetchObject')
+            ->with(UrlAnalysis::class)
             ->willReturn(false);
 
         $this->pdo->expects($this->once())
@@ -75,36 +77,36 @@ class UrlAnalysisRepositoryTest extends TestCase
 
     public function testFindByUrlIdReturnsArrayOfAnalyses(): void
     {
-        $expectedData = [
-            [
-                'id' => 1,
-                'url_id' => 5,
-                'response_code' => 200,
-                'h1' => 'Heading 1',
-                'title' => 'Title 1',
-                'description' => 'Description 1',
-                'created_at' => '2024-01-02 12:00:00',
-                'updated_at' => '2024-01-02 12:00:00',
-            ],
-            [
-                'id' => 2,
-                'url_id' => 5,
-                'response_code' => 200,
-                'h1' => 'Heading 2',
-                'title' => 'Title 2',
-                'description' => 'Description 2',
-                'created_at' => '2024-01-01 12:00:00',
-                'updated_at' => '2024-01-01 12:00:00',
-            ],
-        ];
+        $analysis1 = UrlAnalysis::fromArray([
+            'id' => 1,
+            'url_id' => 5,
+            'response_code' => 200,
+            'h1' => 'Heading 1',
+            'title' => 'Title 1',
+            'description' => 'Description 1',
+            'created_at' => '2024-01-02 12:00:00',
+            'updated_at' => '2024-01-02 12:00:00',
+        ]);
+        
+        $analysis2 = UrlAnalysis::fromArray([
+            'id' => 2,
+            'url_id' => 5,
+            'response_code' => 200,
+            'h1' => 'Heading 2',
+            'title' => 'Title 2',
+            'description' => 'Description 2',
+            'created_at' => '2024-01-01 12:00:00',
+            'updated_at' => '2024-01-01 12:00:00',
+        ]);
 
         $stmt = $this->createMock(PDOStatement::class);
         $stmt->expects($this->once())
             ->method('execute')
             ->with([5]);
-        $stmt->expects($this->once())
-            ->method('fetchAll')
-            ->willReturn($expectedData);
+        $stmt->expects($this->exactly(3))
+            ->method('fetchObject')
+            ->with(UrlAnalysis::class)
+            ->willReturnOnConsecutiveCalls($analysis1, $analysis2, false);
 
         $this->pdo->expects($this->once())
             ->method('prepare')
@@ -127,8 +129,9 @@ class UrlAnalysisRepositoryTest extends TestCase
             ->method('execute')
             ->with([999]);
         $stmt->expects($this->once())
-            ->method('fetchAll')
-            ->willReturn([]);
+            ->method('fetchObject')
+            ->with(UrlAnalysis::class)
+            ->willReturn(false);
 
         $this->pdo->expects($this->once())
             ->method('prepare')
