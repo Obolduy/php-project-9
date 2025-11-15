@@ -73,12 +73,9 @@ class HomeControllerTest extends TestCase
                 $response,
                 'urls/index.twig',
                 $this->callback(function ($params) {
-                    // После getMessages() flash будет содержать массивы сообщений
-                    // В реальном приложении getMessages() забирает сообщения и очищает их
-                    // Для теста мы должны проверить, что params содержит flash ключ
-                    return isset($params['flash']) && 
-                           isset($params['errors']) && 
-                           isset($params['url']) && 
+                    return isset($params['flash']) &&
+                           isset($params['errors']) &&
+                           isset($params['url']) &&
                            isset($params['currentRoute']);
                 })
             )

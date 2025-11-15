@@ -87,7 +87,7 @@ class UrlAnalysisRepositoryTest extends TestCase
             'created_at' => '2024-01-02 12:00:00',
             'updated_at' => '2024-01-02 12:00:00',
         ]);
-        
+
         $analysis2 = UrlAnalysis::fromArray([
             'id' => 2,
             'url_id' => 5,
