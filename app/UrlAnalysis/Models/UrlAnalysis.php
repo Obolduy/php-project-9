@@ -28,39 +28,41 @@ class UrlAnalysis
     public static function fromArray(array $data): self
     {
         $analysis = new self();
-        
+
         if (isset($data['id'])) {
             $analysis->attributes['id'] = is_int($data['id']) ? $data['id'] : (int) $data['id'];
         }
-        
+
         if (isset($data['url_id'])) {
             $analysis->attributes['url_id'] = is_int($data['url_id']) ? $data['url_id'] : (int) $data['url_id'];
         }
-        
+
         if (isset($data['response_code'])) {
-            $analysis->attributes['response_code'] = is_int($data['response_code']) ? $data['response_code'] : (int) $data['response_code'];
+            $analysis->attributes['response_code'] = is_int($data['response_code'])
+                ? $data['response_code']
+                : (int) $data['response_code'];
         }
-        
+
         if (isset($data['h1'])) {
             $analysis->attributes['h1'] = $data['h1'];
         }
-        
+
         if (isset($data['title'])) {
             $analysis->attributes['title'] = $data['title'];
         }
-        
+
         if (isset($data['description'])) {
             $analysis->attributes['description'] = $data['description'];
         }
-        
+
         if (isset($data['created_at'])) {
             $analysis->attributes['created_at'] = $data['created_at'];
         }
-        
+
         if (isset($data['updated_at'])) {
             $analysis->attributes['updated_at'] = $data['updated_at'];
         }
-        
+
         return $analysis;
     }
 

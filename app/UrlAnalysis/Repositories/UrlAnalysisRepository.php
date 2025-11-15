@@ -29,7 +29,7 @@ class UrlAnalysisRepository
             'SELECT * FROM urls_analyses WHERE url_id = ? ORDER BY created_at DESC'
         );
         $stmt->execute([$urlId]);
-        
+
         $results = [];
         while ($obj = $stmt->fetchObject(UrlAnalysis::class)) {
             $results[] = $obj;

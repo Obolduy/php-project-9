@@ -96,4 +96,3 @@ class UrlService
         return $analysis;
     }
 }
-

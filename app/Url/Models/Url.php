@@ -22,23 +22,23 @@ class Url
     public static function fromArray(array $data): self
     {
         $url = new self();
-        
+
         if (isset($data['id'])) {
             $url->attributes['id'] = is_int($data['id']) ? $data['id'] : (int) $data['id'];
         }
-        
+
         if (isset($data['name'])) {
             $url->attributes['name'] = $data['name'];
         }
-        
+
         if (isset($data['created_at'])) {
             $url->attributes['created_at'] = $data['created_at'];
         }
-        
+
         if (isset($data['updated_at'])) {
             $url->attributes['updated_at'] = $data['updated_at'];
         }
-        
+
         return $url;
     }
 
